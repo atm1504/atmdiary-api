@@ -8,7 +8,7 @@ let transporter = nodemailer.createTransport({
     auth: { user: config.EMAIL, pass: config.PASSWORD }
 });
 
-function send_email(email,body,subject,headers) {
+exports.send_email=(email, body, subject, headers)=> {
     transporter.sendMail({
         to: email,
         from: headers,
@@ -20,5 +20,3 @@ function send_email(email,body,subject,headers) {
         return false
     });
 }
-
-exports.send_email = send_email;
