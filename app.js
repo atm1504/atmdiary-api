@@ -14,7 +14,8 @@ const Note = require("./models/note");
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
-
+const userRoutes = require("./routes/user");
+app.use("/user", userRoutes);
 app.get("/", function (req, res) {
     console.log("Request received");
     return res.status(200).json({"ok":"ok"})
@@ -22,7 +23,7 @@ app.get("/", function (req, res) {
 
 
 mongoose
-    .connect(config.MONGODB_URI)
+  .connect(config.MONGODB_URI, { useNewUrlParser: true,useUnifiedTopology: true })
     .then(result => {
       console.log('Connected Database');
       app.listen(3000, function() {
