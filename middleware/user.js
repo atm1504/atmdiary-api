@@ -1,16 +1,18 @@
 const { check, body, query, oneOf, validationResult } = require('express-validator/check');
+const User = require("./../models/user");
+
 
 exports.postSignupValidationCheck = [
     check('email')
         .isEmail()
         .withMessage('Please enter a valid email')
         .custom((value, { req }) => {
-            return User.findOne({
-                email: value
-            }).then((userDoc) => {
+            val = value.toString();
+            return User.findOne({ email: val }).then((userDoc) => {
                 if (userDoc) {
                     return Promise.reject('E-Mail exists already, please pick a different one.');
                 }
+                return true;
             });
         })
         .normalizeEmail(),
@@ -26,10 +28,11 @@ exports.postSignupValidationCheck = [
         }
         return true;
     }),
-    body("phone").trim().custom((value, { req }) => {
-        if (value.length != "f" || value != "m") {
-            throw new Error('Incorrect gender value');
+    body("gender").trim().custom((value, { req }) => {
+        gen = value.toString();
+        if (gen === "m" || gen === "f") {
+            return true;
         }
-        return true;
+        throw new Error('Incorrect gender value');
     })
 ];
