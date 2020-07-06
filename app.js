@@ -6,9 +6,14 @@ const mongoose = require('mongoose');
 var config = require('./config.json');
 const app = express();
 app.use(express.json());
-// app.use('/images', express.static(path.join(__dirname, 'images')));
+
+// Importing models
+const User = require('./models/user');
+const Note = require("./models/note");
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Routes
 
 app.get("/", function (req, res) {
     console.log("Request received");
