@@ -10,15 +10,7 @@ exports.signup = (req, res, net) => {
     if (!errors.isEmpty()) {
     console.log(errors.array());
     return res.status(422).json({
-      path: '/signup',
-      pageTitle: 'Signup',
-      errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array(),
-      oldInput: {
-        email: email,
-        password: password,
-        confirmPassword: req.body.confirmPassword
-      }
+      validationErrors: errors.array()
     });
   }
 
