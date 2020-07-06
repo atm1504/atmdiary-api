@@ -9,6 +9,6 @@ The backend is being developed using NodeJs and MongoDb. Its currently under dev
 * First, fork and clone the repository.
 * Create a virtual environment inside the cloned folder.
 * Activate the virtual environment.
-* Install the required dependencies by using the following command ```pip install -r requirements.txt```
-* Put your mongodb url in the ```atmdiary/config.py``` file.
-* Now execute ```python3 app.py``` to run the application.
+* Install the required dependencies by using the following command ```npm install```
+* Create a ```config.json``` file and add the value of the following parameter in json format ```MONGODB_URI, EMAIL, PASSWORD, EMAIL_HOST, EMAIL_PORT```.
+* Now execute ```npm start``` to run the application.
