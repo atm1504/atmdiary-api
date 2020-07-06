@@ -12,3 +12,7 @@ The backend is being developed using NodeJs and MongoDb. Its currently under dev
 * Install the required dependencies by using the following command ```npm install```
 * Create a ```config.json``` file and add the value of the following parameter in json format ```MONGODB_URI, EMAIL, PASSWORD, EMAIL_HOST, EMAIL_PORT```.
 * Now execute ```npm start``` to run the application.
+
+### API Endpoints
+Check the wiki section for the endpoints. 
+[API'S](https://github.com/atm1504/atmdiary-api/wiki)

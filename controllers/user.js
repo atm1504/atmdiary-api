@@ -17,7 +17,7 @@ exports.postSignup = (req, res, net) => {
     if (!errors.isEmpty()) {
         return res.status(403).json({
             status:403,
-            validationErrors: errors.array()
+            message: errors.array()
         });
     }
     var token = randtoken.generate(16);
@@ -26,7 +26,7 @@ exports.postSignup = (req, res, net) => {
             if (userDoc) {
                 return res.status(403).json({
                     status: 403,
-                    validationErrors: ["Email id already in use. Use a different email id."]
+                    message: ["Email id already in use. Use a different email id."]
                 });
             }
             return bcrypt.hash(password, 12)
@@ -42,12 +42,12 @@ exports.postSignup = (req, res, net) => {
                 .then(result => {
                     return res.status(202).json({
                         status: "202",
-                        message: "Registration successful. Please verify your email to activate your account."
+                        message: ["Registration successful. Please verify your email to activate your account."]
                     });
                 }).catch(err => {
                     return res.status(500).json({
                         status: "500",
-                        message: "Server error occurred. Please try again after sometime."
+                        message: ["Server error occurred. Please try again after sometime."]
                     });
                 });
         })
