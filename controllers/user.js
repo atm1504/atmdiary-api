@@ -3,12 +3,13 @@ const path = require("path");
 const util = require('../utilities/util');
 const { validationResult, body, header } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const User = require("../models/user");
-const { has } = require('config');
+const { User } = require("../models/user");
+const config = require('./../config.json');
 const randtoken = require('rand-token');
 const { getMaxListeners } = require('../models/user');
+const JWT = require('jsonwebtoken');
 
-exports.postSignup = (req, res, net) => {
+exports.postSignup = (req, res, next) => {
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
@@ -32,7 +33,7 @@ exports.postSignup = (req, res, net) => {
             return bcrypt.hash(password, 12)
                 .then(hashedPassword => {
                     ctime = Date.now();
-                    const user = User({ name: name, email: email, password: hashedPassword, gender: gender, creation_time: ctime, active: 0, resetTokenExpiration: ctime + 3600000, resetToken: token });
+                    const user = User({ name: name, email: email, password: hashedPassword, gender: gender, creation_time: ctime, active: 1, resetTokenExpiration: ctime + 3600000, resetToken: token });
                     return user.save();
                 }).then(result => {
                     var body = '<h1>Successfully created your account.</h1><br><h4>Click here to activate your account <a href="http://localhost:3000/user/activate?token=${token}&email=${email}">link</a> </h4>';
@@ -51,4 +52,25 @@ exports.postSignup = (req, res, net) => {
                     });
                 });
         })
+}
+
+accessToken = (user) => {
+    return JWT.sign({
+        iss: 'atm1504',
+        sub: user.id,
+        iat: new Date().getTime(),
+        exp: new Date().setDate(new Date().getDate() + 10)
+    }, config.JWT_SECRET)
+}
+
+exports.postSignin = (req, res, next) => {
+    const user = req.user;
+    const token = accessToken(user);
+    console.log(user)
+    res.status(200).json({
+        data: {
+            token: token,
+            user: user
+        }
+    });
 }
