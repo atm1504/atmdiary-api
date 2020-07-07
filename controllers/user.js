@@ -4,11 +4,10 @@ const util = require('../utilities/util');
 const { validationResult, body, header } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const { User } = require("../models/user");
-const config = require('./../config.json');
 const randtoken = require('rand-token');
 const { getMaxListeners } = require('../models/user');
 const JWT = require('jsonwebtoken');
-const { get } = require('config');
+const { JWT_SECRET } = require('./../configs/config');
 
 getToken= (email,token) => {
     return JWT.sign({
@@ -17,7 +16,7 @@ getToken= (email,token) => {
         token:token,
         iat: new Date.now(),
         exp: new Date.now() + 3600000
-}, config.JWT_SECRET)
+}, JWT_SECRET)
 }
 
 exports.postSignup = (req, res, next) => {
@@ -73,7 +72,7 @@ accessToken = (user) => {
         sub: user.id,
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getDate() + 10)
-    }, config.JWT_SECRET)
+    }, JWT_SECRET)
 }
 
 exports.postSignin = (req, res, next) => {

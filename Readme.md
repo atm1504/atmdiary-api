@@ -10,7 +10,7 @@ The backend is being developed using NodeJs and MongoDb. Its currently under dev
 * Create a virtual environment inside the cloned folder.
 * Activate the virtual environment.
 * Install the required dependencies by using the following command ```npm install```
-* Create a ```config.json``` file and add the value of the following parameter in json format ```MONGODB_URI, EMAIL, PASSWORD, EMAIL_HOST, EMAIL_PORT```.
+* Create a ```.env``` file in the root directory and add the value of the following parameter ```MONGODB_URI, EMAIL, PASSWORD, EMAIL_HOST, EMAIL_PORT,JWT_SECRET```.
 * Now execute ```npm start``` to run the application.
 
 ### API Endpoints
