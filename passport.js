@@ -47,7 +47,7 @@ passport.use("resetToken",new JwtStrategy({
             if (ct > expTime) {
                 return done({
                 message: 'Token has expired! Please resend your token.',
-                status: 400
+                status: 403
                 }, false);
             }
         if (!user) {
