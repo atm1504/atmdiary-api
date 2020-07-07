@@ -8,6 +8,17 @@ const config = require('./../config.json');
 const randtoken = require('rand-token');
 const { getMaxListeners } = require('../models/user');
 const JWT = require('jsonwebtoken');
+const { get } = require('config');
+
+getToken= (email,token) => {
+    return JWT.sign({
+        iss: 'atm1504',
+        email: email,
+        token:token,
+        iat: new Date.now(),
+        exp: new Date.now() + 3600000
+}, config.JWT_SECRET)
+}
 
 exports.postSignup = (req, res, next) => {
     const name = req.body.name;
@@ -21,7 +32,8 @@ exports.postSignup = (req, res, next) => {
             message: errors.array()
         });
     }
-    var token = randtoken.generate(16);
+    let token;
+    var rtoken = randtoken.generate(16);
     User.findOne({ email: email })
         .then(userDoc => {
             if (userDoc) {
@@ -33,7 +45,8 @@ exports.postSignup = (req, res, next) => {
             return bcrypt.hash(password, 12)
                 .then(hashedPassword => {
                     ctime = Date.now();
-                    const user = User({ name: name, email: email, password: hashedPassword, gender: gender, creation_time: ctime, active: 1, resetTokenExpiration: ctime + 3600000, resetToken: token });
+                    token = getToken(email, rtoken)
+                    const user = User({ name: name, email: email, password: hashedPassword, gender: gender, creation_time: ctime, active: 1, resetTokenExpiration: ctime + 3600000, resetToken: rtoken });
                     return user.save();
                 }).then(result => {
                     var body = '<h1>Successfully created your account.</h1><br><h4>Click here to activate your account <a href="http://localhost:3000/user/activate?token=${token}&email=${email}">link</a> </h4>';

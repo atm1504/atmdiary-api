@@ -14,4 +14,4 @@ module.exports = router.post(
 	userController.postSignup
 );
 
-module.exports = router.post("/signin", userMiddleWare.postSigninValidationCheck, passport.authenticate('local', { session: false }), userController.postSignin);
+module.exports = router.post("/signin", userMiddleWare.postSigninValidationCheck, passport.authenticate('signin', { session: false }), userController.postSignin);
