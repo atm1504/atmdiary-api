@@ -5,13 +5,13 @@ const {
 } = require('passport-jwt');
 const LocalStrategy = require('passport-local').Strategy;
 
-const config = require('./config.json');
+const { JWT_SECRET} = require("./configs/config");
 const { User } = require('./models/user')
 
 //JSON WEB TOKENS STRATEGY for api requests
 passport.use("requestAuth",new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey: config.JWT_SECRET
+    secretOrKey: JWT_SECRET
 }, async (payload, done) => {
     try {
         const user = await User.findById(payload.sub)
@@ -30,7 +30,7 @@ passport.use("requestAuth",new JwtStrategy({
 // JSON Web Token Strategy for reset tokens
 passport.use("resetToken",new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromUrlQueryParameter("token"),
-    secretOrKey: config.JWT_SECRET
+    secretOrKey: JWT_SECRET
 }, async (payload, done) => {
     try {
         const user = await User.find({ email: payload.email })

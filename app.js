@@ -1,3 +1,4 @@
+const {MONGODB_URI, EMAIL } = require("./configs/config");
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -5,9 +6,7 @@ const mongoose = require('mongoose');
 var multer = require('multer');
 var upload = multer();
 
-var config = require('./config.json');
 const app = express();
-
 // For performing all kinds of operations
 app.use(express.json());
 app.use(bodyParser.json());
@@ -45,14 +44,13 @@ app.use((err, req, res, next) => {
 
 
 mongoose
-  .connect(config.MONGODB_URI, { useNewUrlParser: true,useUnifiedTopology: true })
+  .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
     .then(result => {
       console.log('Connected Database');
       app.listen(3000, function() {
         console.log('App listening on port ' + 3000 + '!');
       });
     })
-    .catch(err => {
-      console.log(err);
-
-    });
+  .catch(err => {
+    console.log(err);
+  });
