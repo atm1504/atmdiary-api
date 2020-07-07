@@ -14,10 +14,12 @@ getToken= (email,token) => {
         iss: 'atm1504',
         email: email,
         token:token,
-        iat: new Date.now(),
-        exp: new Date.now() + 3600000
+        iat:  Date.now(),
+        exp:  Date.now() + 3600000
 }, JWT_SECRET)
 }
+
+const HOST = "127.0.0.1:3000";
 
 exports.postSignup = (req, res, next) => {
     const name = req.body.name;
@@ -45,10 +47,10 @@ exports.postSignup = (req, res, next) => {
                 .then(hashedPassword => {
                     ctime = Date.now();
                     token = getToken(email, rtoken)
-                    const user = User({ name: name, email: email, password: hashedPassword, gender: gender, creation_time: ctime, active: 1, resetTokenExpiration: ctime + 3600000, resetToken: rtoken });
+                    const user = User({ name: name, email: email, password: hashedPassword, gender: gender, creation_time: ctime, active: 0, resetTokenExpiration: ctime + 3600000, resetToken: rtoken });
                     return user.save();
                 }).then(result => {
-                    var body = '<h1>Successfully created your account.</h1><br><h4>Click here to activate your account <a href="http://localhost:3000/user/activate?token=${token}&email=${email}">link</a> </h4>';
+                    var body = '<h1>Successfully created your account.</h1><br><h4>Click here to activate your account <a href="http://' + HOST + '/user/activate?token=' + token + '">link</a> </h4>';
                     var t = util.send_email(email, body, "ATMDIARY account activation link", "info@atmdiary.com");
                     return t;
                 })
@@ -58,6 +60,7 @@ exports.postSignup = (req, res, next) => {
                         message: ["Registration successful. Please verify your email to activate your account."]
                     });
                 }).catch(err => {
+                    console.log(err);
                     return res.status(500).json({
                         status: "500",
                         message: ["Server error occurred. Please try again after sometime."]
@@ -68,8 +71,8 @@ exports.postSignup = (req, res, next) => {
 
 accessToken = (user) => {
     return JWT.sign({
-        iss: 'atm1504',
-        sub: user.id,
+        atm: 'atm1504',
+        id: user.id,
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getDate() + 10)
     }, JWT_SECRET)
@@ -78,11 +81,22 @@ accessToken = (user) => {
 exports.postSignin = (req, res, next) => {
     const user = req.user;
     const token = accessToken(user);
-    console.log(user)
-    res.status(200).json({
-        data: {
-            token: token,
-            user: user
-        }
+    return res.status(200).json({
+        status: 200,
+        token: token,
+        user: user
     });
+}
+
+exports.getActivateAccount = async (req, res, next) => {
+    const user = req.user;
+    user.active = 1
+    user.resetToken = "";
+    await user.save();
+    var body = '<h1>Successfully verified your email! Enjoy using atmdiary!</h1>';
+    var t = await util.send_email(user.email, body, "ATMDIARY Account Verified", "info@atmdiary.com");
+    return res.status(200).json({
+        message: "User email " +user.email+" successfully verified!",
+        status: 200
+    })
 }

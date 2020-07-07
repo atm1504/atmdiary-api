@@ -15,3 +15,4 @@ module.exports = router.post(
 );
 
 module.exports = router.post("/signin", userMiddleWare.postSigninValidationCheck, passport.authenticate('signin', { session: false }), userController.postSignin);
+module.exports = router.get("/activate", userMiddleWare.activateAccountValidationCheck, passport.authenticate("resetToken", { session: false }),userController.getActivateAccount);

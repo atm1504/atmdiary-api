@@ -58,3 +58,8 @@ exports.postSigninValidationCheck = [
         .isAlphanumeric()
         .trim(),
 ]
+
+exports.activateAccountValidationCheck = [
+    check("token")
+        .isLength({ min: 5 }).withMessage("Activation token not set")
+]
