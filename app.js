@@ -33,7 +33,7 @@ app.use((req, res, next) => {
     next(err);
 })
 
-//Error handeler function
+//Error handler function
 app.use((err, req, res, next) => {
     const error = err;
     const status = err.status || 500;

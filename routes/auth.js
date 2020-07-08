@@ -34,3 +34,9 @@ module.exports = router.post(
 	passport.authenticate('access', { session: false }),
 	authController.changePassWord
 );
+
+module.exports = router.post(
+	"/password/forgot",
+	authMiddleWare.forgotPasswordValidationCheck,
+	authController.forgotPassword
+)

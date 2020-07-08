@@ -39,7 +39,7 @@ exports.postSignup = (req, res, next) => {
             if (userDoc) {
                 return res.status(403).json({
                     status: 403,
-                    message: ["Email id already in use. Use a different email id."]
+                    message: "Email id already in use. Use a different email id."
                 });
             }
             return bcrypt.hash(password, 12)
@@ -56,13 +56,13 @@ exports.postSignup = (req, res, next) => {
                 .then(result => {
                     return res.status(202).json({
                         status: "202",
-                        message: ["Registration successful. Please verify your email to activate your account."]
+                        message: "Registration successful. Please verify your email to activate your account."
                     });
                 }).catch(err => {
                     console.log(err);
                     return res.status(500).json({
                         status: "500",
-                        message: ["Server error occurred. Please try again after sometime."]
+                        message: "Server error occurred. Please try again after sometime."
                     });
                 });
         })
@@ -80,6 +80,13 @@ accessToken = (user,rtoken) => {
 
 exports.postSignin = async (req, res, next) => {
     const user = req.user;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(403).json({
+            status:403,
+            message: errors.array()
+        });
+    }
     var rtoken = randtoken.generate(16);
     const token = accessToken(user, rtoken);
     user.accessToken = rtoken;
@@ -118,6 +125,13 @@ exports.getActivateAccount = async (req, res, next) => {
 exports.changePassWord = async (req, res, next) => {
     var user = req.user;
     var password = req.body.password;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(403).json({
+            status:403,
+            message: errors.array()
+        });
+    }
     var result = await user.changePassword(password);
     if (result) {
         user.save()
@@ -129,5 +143,42 @@ exports.changePassWord = async (req, res, next) => {
     return res.status(500).json({
         message: "Server error occurred!",
         status: 500
+    })
+}
+
+exports.forgotPassword = async (req, res, next) => {
+    const email = req.body.email;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(403).json({
+            status:403,
+            message: errors.array()
+        });
+    }
+    console.log("Came here" + email);
+    const token = randtoken.generate(6, "1234567890");
+    User.findOne({ email: email })
+        .then(user => {
+            console.log(user);
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: "Email not registered!"
+                })
+            }
+            user.resetToken = token;
+            user.resetTokenExpiration = Date.now() + 600000;
+            return user.save()
+        }).then(result => {
+            var body = '<h1>Successfully initiated your password reset process! If it was not you or you did it by mistake, then please ignore this email.</h1><br><h3> Your otp is: </h3> <h2>' + token + '</h2>';
+            return util.send_email(email, body, "ATMDIARY password reset");
+        }).then(result => {
+            return res.status(200).json({ status: 200, message: "Password reset successfully initiated. Check your email for otp!" });
+        })
+        .catch(err => {
+            return res.status(500).json({
+                message: "Server error occurred!",
+                status: 500
+            })
     })
 }
