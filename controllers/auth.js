@@ -50,7 +50,7 @@ exports.postSignup = (req, res, next) => {
                     return user.save();
                 }).then(result => {
                     var body = '<h1>Successfully created your account.</h1><br><h4>Click here to activate your account <a href="http://' + HOST + '/auth/activate?token=' + token + '">link</a> </h4>';
-                    var t = util.send_email(email, body, "ATMDIARY account activation link", "info@atmdiary.com");
+                    var t = util.send_email(email, body, "ATMDIARY account activation link");
                     return t;
                 })
                 .then(result => {
@@ -103,7 +103,7 @@ exports.getActivateAccount = async (req, res, next) => {
     user.resetToken = "";
     await user.save();
     var body = '<h1>Successfully verified your email! Enjoy using atmdiary!</h1>';
-    var t = await util.send_email(user.email, body, "ATMDIARY Account Verified", "info@atmdiary.com");
+    var t = await util.send_email(user.email, body, "ATMDIARY Account Verified");
     return res.status(200).json({
         message: "User email " +user.email+" successfully verified!",
         status: 200
