@@ -14,8 +14,7 @@ exports.postSignupValidationCheck = [
                 }
                 return true;
             });
-        })
-        .normalizeEmail(),
+        }),
     body('password', 'Please enter a password with only numbers and text and at least 5 characters.')
         .isLength({
             min: 5
@@ -47,10 +46,9 @@ exports.postSigninValidationCheck = [
                 if (userDoc) {
                     return true;
                 }
-                return Promise.reject("E-Mail doesn't. Register first");
+                return Promise.reject("E-Mail doesn't exist. Register first");
             });
-        })
-        .normalizeEmail(),
+        }),
     body('password', 'Please enter a password with only numbers and text and at least 5 characters.')
         .isLength({
             min: 5
@@ -77,4 +75,20 @@ exports.changePasswordValidationCheck = [
         }
         return true;
     }),
+]
+
+// CHeck if email is set or not
+exports.forgotPasswordValidationCheck = [
+    check('email')
+        .isEmail()
+        .withMessage('Please enter a valid email')
+        .custom((value, { req }) => {
+            val = value.toString();
+            return User.findOne({ email: val }).then((userDoc) => {
+                if (userDoc) {
+                    return true;
+                }
+                return Promise.reject("E-Mail doesn't exist. Register first!");
+            });
+        })
 ]
