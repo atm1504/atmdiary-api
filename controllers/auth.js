@@ -146,7 +146,7 @@ exports.changePassWord = async (req, res, next) => {
     })
 }
 
-exports.forgotPassword = async (req, res, next) => {
+exports.forgotPassword =  (req, res, next) => {
     const email = req.body.email;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -155,11 +155,10 @@ exports.forgotPassword = async (req, res, next) => {
             message: errors.array()
         });
     }
-    console.log("Came here" + email);
     const token = randtoken.generate(6, "1234567890");
     User.findOne({ email: email })
         .then(user => {
-            console.log(user);
+
             if (!user) {
                 return res.status(404).json({
                     status: 404,
@@ -170,10 +169,10 @@ exports.forgotPassword = async (req, res, next) => {
             user.resetTokenExpiration = Date.now() + 600000;
             return user.save()
         }).then(result => {
-            var body = '<h1>Successfully initiated your password reset process! If it was not you or you did it by mistake, then please ignore this email.</h1><br><h3> Your otp is: </h3> <h2>' + token + '</h2>';
+            var body = '<h1>Successfully initiated your password reset process! If it was not you or you did it by mistake, then please ignore this email.</h1><br><h3> Your otp is: </h3> <h2>' + token + '</h2> <br> <h4>OTP will expire in 10 minutes!</h4>';
             return util.send_email(email, body, "ATMDIARY password reset");
         }).then(result => {
-            return res.status(200).json({ status: 200, message: "Password reset successfully initiated. Check your email for otp!" });
+            return res.status(200).json({ status: 200, message: "Password reset successfully initiated. Check your email for otp! Your OTP would expire in 10 minutes!" });
         })
         .catch(err => {
             return res.status(500).json({
@@ -181,4 +180,42 @@ exports.forgotPassword = async (req, res, next) => {
                 status: 500
             })
     })
+}
+
+exports.forgotPasswordOTP = async (req, res, next) => {
+    const email = req.body.email;
+    const otp = req.body.otp;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(403).json({
+            status:403,
+            message: errors.array()
+        });
+    }
+
+    const user = await User.findOne({ email: email });
+    if (user.resetToken !== otp) {
+        return res.status(406).json({
+            status: 406,
+            message:"OTP did not match! Please enter correct OTP!"
+        })
+    }
+    const time = Date.now();
+    if (time > user.resetTokenExpiration) {
+        return res.status(401).json({
+            status: 401,
+            message:"OTP has expired! Try to start reset password method again!"
+        })
+    }
+
+    var rtoken = randtoken.generate(16);
+    const token = accessToken(user, rtoken);
+    user.accessToken = rtoken;
+    user.resetToken = "";
+    await user.save();
+    return res.status(200).json({
+        status: 200,
+        token: token,
+        message: "Verified user! Proceed to reset password!"
+    });
 }

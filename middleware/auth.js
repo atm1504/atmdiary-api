@@ -92,3 +92,21 @@ exports.forgotPasswordValidationCheck = [
             });
         })
 ]
+
+exports.forgotPasswordOTPValiodationCheck = [
+        check('email')
+        .isEmail()
+        .withMessage('Please enter a valid email')
+        .custom((value, { req }) => {
+            val = value.toString();
+            return User.findOne({ email: val }).then((userDoc) => {
+                if (userDoc) {
+                    return true;
+                }
+                return Promise.reject("E-Mail doesn't exist. Register first!");
+            });
+        }),
+    check("otp")
+        .isLength({ min: 6, max: 6 })
+        .withMessage("Enter a valid otp")
+]

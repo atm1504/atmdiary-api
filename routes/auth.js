@@ -40,3 +40,9 @@ module.exports = router.post(
 	authMiddleWare.forgotPasswordValidationCheck,
 	authController.forgotPassword
 )
+
+module.exports = router.post(
+	"/password/forgot/otp",
+	authMiddleWare.forgotPasswordOTPValiodationCheck,
+	authController.forgotPasswordOTP
+)
