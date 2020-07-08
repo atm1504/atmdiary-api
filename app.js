@@ -19,8 +19,8 @@ const Note = require("./models/note");
 
 
 // Routes
-const userRoutes = require("./routes/user");
-app.use("/user", userRoutes);
+const authRoutes = require("./routes/auth");
+app.use("/auth", authRoutes);
 app.get("/", function (req, res) {
     console.log("Request received");
     return res.status(200).json({"ok":"ok"})

@@ -8,7 +8,7 @@ const { User } = require('./models/user');
 const { use } = require('passport');
 
 //JSON WEB TOKENS STRATEGY for api requests
-passport.use("requestAuth",new JwtStrategy({
+passport.use("access",new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
     secretOrKey: JWT_SECRET
 }, async (payload, done) => {
@@ -17,12 +17,12 @@ passport.use("requestAuth",new JwtStrategy({
             const ct = Date.now();
             if (ct > expTime) {
                 return done({
-                message: 'Token has expired! Signout and login again!',
+                message: 'Token has expired! Sign out and login again!',
                 status: 400
                 }, false);
             }
-        const user = await User.findById(payload.email)
-        if (!user) {
+        const user = await User.findById(payload.id)
+        if (!user || user.accessToken!=payload.token ) {
             return done({
                 message: 'Unauthorized user',
                 status: 401
@@ -40,7 +40,6 @@ passport.use("resetToken",new JwtStrategy({
     secretOrKey: JWT_SECRET
 }, async (payload, done) => {
         try {
-            console.log(payload);
             const user = await User.findOne({ email: payload.email })
             const expTime = payload.exp;
             const ct = Date.now();
@@ -62,14 +61,8 @@ passport.use("resetToken",new JwtStrategy({
                 status: 401
             }, false);
         }
-        if (user.active == 1) {
-            return done({
-                message: 'Account already verified!',
-                status: 400
-            }, false);
-        }
         done(null, user);
-    } catch (error) {
+        } catch (error) {
         done(error, false);
     }
 }));
@@ -79,22 +72,17 @@ passport.use("signin",new LocalStrategy({
     usernameField: 'email'
 }, async (email, password, done) => {
         try {
-        //find the user given the email
         const user = await User.findOne({
             email: email
         });
 
-        //if not handle it
         if (!user) {
             return done({
                 message: 'User not found! Register First.',
                 status: 404
             }, false, );
         }
-
         const isMatch = await user.isValidPassword(password)
-
-        //if not, handle it
         if (!isMatch) {
             return done({
                 message: 'Wrong Password! Try again!',
@@ -107,10 +95,8 @@ passport.use("signin",new LocalStrategy({
                 status: 401
             }, false);
         }
-        //otherwise return the user
         done(null, user);
     } catch (error) {
         done(error, false);
     }
-
 }))
