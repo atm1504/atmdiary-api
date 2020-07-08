@@ -1,5 +1,5 @@
 const { check, body, query, oneOf, validationResult } = require('express-validator/check');
-const { User } = require("./../models/user");
+const { User } = require("../models/user");
 
 
 exports.postSignupValidationCheck = [

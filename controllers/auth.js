@@ -5,13 +5,12 @@ const { validationResult, body, header } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const { User } = require("../models/user");
 const randtoken = require('rand-token');
-const { getMaxListeners } = require('../models/user');
 const JWT = require('jsonwebtoken');
-const { JWT_SECRET } = require('./../configs/config');
+const { JWT_SECRET } = require('../configs/config');
 
 getToken= (email,token) => {
     return JWT.sign({
-        iss: 'atm1504',
+        atm: 'atm1504',
         email: email,
         token:token,
         iat:  Date.now(),
@@ -50,7 +49,7 @@ exports.postSignup = (req, res, next) => {
                     const user = User({ name: name, email: email, password: hashedPassword, gender: gender, creation_time: ctime, active: 0, resetTokenExpiration: ctime + 3600000, resetToken: rtoken });
                     return user.save();
                 }).then(result => {
-                    var body = '<h1>Successfully created your account.</h1><br><h4>Click here to activate your account <a href="http://' + HOST + '/user/activate?token=' + token + '">link</a> </h4>';
+                    var body = '<h1>Successfully created your account.</h1><br><h4>Click here to activate your account <a href="http://' + HOST + '/auth/activate?token=' + token + '">link</a> </h4>';
                     var t = util.send_email(email, body, "ATMDIARY account activation link", "info@atmdiary.com");
                     return t;
                 })
@@ -69,18 +68,22 @@ exports.postSignup = (req, res, next) => {
         })
 }
 
-accessToken = (user) => {
+accessToken = (user,rtoken) => {
     return JWT.sign({
         atm: 'atm1504',
         id: user.id,
+        token:rtoken,
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getDate() + 10)
     }, JWT_SECRET)
 }
 
-exports.postSignin = (req, res, next) => {
+exports.postSignin = async (req, res, next) => {
     const user = req.user;
-    const token = accessToken(user);
+    var rtoken = randtoken.generate(16);
+    const token = accessToken(user, rtoken);
+    user.accessToken = rtoken;
+    await user.save();
     return res.status(200).json({
         status: 200,
         token: token,
@@ -90,6 +93,12 @@ exports.postSignin = (req, res, next) => {
 
 exports.getActivateAccount = async (req, res, next) => {
     const user = req.user;
+    if (user.active == 1) {
+        return res.status(400).json({
+            message: 'Account already verified!',
+            status: 400
+        })
+    }
     user.active = 1
     user.resetToken = "";
     await user.save();
