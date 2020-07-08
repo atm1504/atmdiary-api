@@ -29,7 +29,7 @@ exports.postSignup = (req, res, next) => {
     if (!errors.isEmpty()) {
         return res.status(403).json({
             status:403,
-            message: errors.array()
+            message: errors.array()[0]
         });
     }
     let token;
@@ -84,7 +84,7 @@ exports.postSignin = async (req, res, next) => {
     if (!errors.isEmpty()) {
         return res.status(403).json({
             status:403,
-            message: errors.array()
+            message: errors.array()[0]
         });
     }
     var rtoken = randtoken.generate(16);
@@ -129,7 +129,7 @@ exports.changePassWord = async (req, res, next) => {
     if (!errors.isEmpty()) {
         return res.status(403).json({
             status:403,
-            message: errors.array()
+            message: errors.array()[0]
         });
     }
     var result = await user.changePassword(password);
@@ -152,7 +152,7 @@ exports.forgotPassword =  (req, res, next) => {
     if (!errors.isEmpty()) {
         return res.status(403).json({
             status:403,
-            message: errors.array()
+            message: errors.array()[0]
         });
     }
     const token = randtoken.generate(6, "1234567890");
@@ -189,7 +189,7 @@ exports.forgotPasswordOTP = async (req, res, next) => {
     if (!errors.isEmpty()) {
         return res.status(403).json({
             status:403,
-            message: errors.array()
+            message: errors.array()[0]
         });
     }
 
