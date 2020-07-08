@@ -20,9 +20,17 @@ module.exports = router.post(
 	passport.authenticate('signin', { session: false }),
 	authController.postSignin
 );
+
 module.exports = router.get(
 	"/activate",
 	authMiddleWare.activateAccountValidationCheck,
 	passport.authenticate('resetToken', { session: false }),
 	authController.getActivateAccount
+);
+
+module.exports = router.post(
+	"/password/change",
+	authMiddleWare.changePasswordValidationCheck,
+	passport.authenticate('access', { session: false }),
+	authController.changePassWord
 );
