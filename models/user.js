@@ -21,5 +21,17 @@ userSchema.methods.isValidPassword = async function (newPassword) {
 		throw new Error(error);
 	}
 }
+
+userSchema.methods.changePassword = function (newPassword) {
+    try {
+        return bcrypt.hash(newPassword, 12).then(hashPass => {
+            this.password = hashPass;
+            return true;
+        })
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 const User = mongoose.model("user", userSchema);
 module.exports = { User }

@@ -87,7 +87,12 @@ exports.postSignin = async (req, res, next) => {
     return res.status(200).json({
         status: 200,
         token: token,
-        user: user
+        user: {
+            "name": user.name,
+            "profile_pic": user.profile_pic,
+            "email": user.email,
+            "gender": user.gender
+        }
     });
 }
 
@@ -107,5 +112,22 @@ exports.getActivateAccount = async (req, res, next) => {
     return res.status(200).json({
         message: "User email " +user.email+" successfully verified!",
         status: 200
+    })
+}
+
+exports.changePassWord = async (req, res, next) => {
+    var user = req.user;
+    var password = req.body.password;
+    var result = await user.changePassword(password);
+    if (result) {
+        user.save()
+        return res.status(200).json({
+            message: "Password changed successfully!",
+            status: 200
+        })
+    }
+    return res.status(500).json({
+        message: "Server error occurred!",
+        status: 500
     })
 }

@@ -63,3 +63,18 @@ exports.activateAccountValidationCheck = [
     check("token")
         .isLength({ min: 5 }).withMessage("Activation token not set")
 ]
+
+exports.changePasswordValidationCheck = [
+    body('password', 'Please enter a password with only numbers and text and at least 5 characters.')
+        .isLength({
+            min: 5
+        })
+        .isAlphanumeric()
+        .trim(),
+    body('confirmPassword').trim().custom((value, { req }) => {
+        if (value !== req.body.password) {
+            throw new Error("Password fields didn't match!");
+        }
+        return true;
+    }),
+]

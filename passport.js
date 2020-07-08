@@ -22,7 +22,7 @@ passport.use("access",new JwtStrategy({
                 }, false);
             }
         const user = await User.findById(payload.id)
-        if (!user || user.accessToken!=payload.token ) {
+        if (!user || user.accessToken != payload.token) {
             return done({
                 message: 'Unauthorized user',
                 status: 401
